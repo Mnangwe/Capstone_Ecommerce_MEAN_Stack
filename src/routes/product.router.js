@@ -16,7 +16,7 @@ module.exports = app => {
     router.post("/", 
         [
             authJwt.verifyToken,
-            authJwt.isAdmin
+            authJwt.isModerator
         ], 
         products.create
     )
