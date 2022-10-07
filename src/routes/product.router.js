@@ -36,7 +36,7 @@ module.exports = app => {
     router.put("/:id", 
         [
             authJwt.verifyToken,
-            authJwt.isAdmin
+            // authJwt.isAdmin
         ],
         products.update
     )

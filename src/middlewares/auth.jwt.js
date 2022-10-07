@@ -22,6 +22,16 @@ const verifyToken = (req, res, next) => {
     
 }
 
+const verifyIsUser = (req, res ,next) => {
+  const id  = req.params.id
+  
+  if(id != req.userId) {
+    res.status(400).send({ msg: "You not allowed. This is not your profile." })
+    return
+  } 
+  next()
+}
+
 const isAdmin = (req, res, next) => {
     User.findById(req.userId).exec((err, user) => {
         if(err) {
@@ -85,7 +95,8 @@ const isModerator = (req, res, next) => {
   const authJwt = {
     verifyToken,
     isAdmin,
-    isModerator
+    isModerator,
+    verifyIsUser
   }
 
   module.exports = authJwt

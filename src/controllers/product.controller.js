@@ -73,7 +73,7 @@ exports.update = (req, res) => {
                     msg: `Cannot update product with id=${id}. Maybe it was not found.`
                 })
             } else {
-                res.status(202).send({ msg: "Product was successfully!"})
+                res.status(202).send({ msg: "Product was updated successfully!"})
             }
         })
         .catch(err => {
