@@ -5,10 +5,6 @@ let schema = new mongoose.Schema({
     category: Array,
     price: Number,
     image: String,
-    quantity: {
-        type: Number,
-        default: 1
-    }
 }, { timestamps: true })
 
 schema.method("toJSON", function() {

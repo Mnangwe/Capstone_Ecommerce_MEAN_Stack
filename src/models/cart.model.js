@@ -2,12 +2,7 @@ const mongoose = require("mongoose")
 
 let schema = new mongoose.Schema({
         userId: String,
-        products: [
-            {
-                productId: String,
-                quantity: Number
-            }
-        ]
+        products: Array
     }, { timestamps: true })
 
 schema.method("toJSON", function(){

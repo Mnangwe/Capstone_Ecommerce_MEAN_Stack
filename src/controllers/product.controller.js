@@ -47,6 +47,8 @@ exports.findOne = (req, res) => {
 
     Product.findById(id)
         .then(data => {
+            console.log(data)
+            console.log(id)
             res.status(200).send(data)
         })
         .catch(err => {

@@ -62,6 +62,7 @@ app.get('/', (req, res, next) => {
     res.send('<h1>Hello world<h1>');
 })
 
+require("./src/routes/cart.router")(app)
 require("./src/routes/product.router")(app)
 require("./src/routes/auth.router")(app)
 require("./src/routes/user.router")(app)
