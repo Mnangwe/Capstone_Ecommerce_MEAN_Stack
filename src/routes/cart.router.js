@@ -13,9 +13,9 @@ module.exports = app => {
 
     const router = require("express").Router()
 
-    router.post("/:id", 
+    router.post("/", 
         [
-            authJwt.verifyToken,
+            // authJwt.verifyToken,
             // authJwt.verifyIsUser
         ], 
         cart.create
@@ -23,8 +23,8 @@ module.exports = app => {
 
     router.get("/",
         [
-            authJwt.verifyToken,
-            authJwt.isModerator
+            // authJwt.verifyToken,
+            // authJwt.isModerator
         ],
         cart.findAll
     )
@@ -33,18 +33,27 @@ module.exports = app => {
         [
             authJwt.verifyToken
         ], 
-        cart.findOne
+        cart.findUserCart
     )
 
-    router.get("/:id", cart.getProductCart)
+    router.get("/userCart/:id",
+        [
+            // authJwt.verifyToken
+        ], 
+        cart.findOneCart
+    )
 
-    router.put("/:id", 
+    router.put("/:id", cart.update)
+
+    router.put("/:id/product/:productId", 
         [
             authJwt.verifyToken,
             // authJwt.verifyIsUser
         ],
-        cart.update
+        cart.updateOneProduct
     )
+
+    router.delete("/:id", cart.delete)
 
 
     app.use("/api/cart/", router)

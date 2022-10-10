@@ -1,3 +1,4 @@
+const { cart } = require("../models")
 const db = require("../models")
 const Cart = db.cart
 
@@ -33,8 +34,8 @@ exports.findAll = (req, res) => {
         })
 }
 
-exports.findOne = (req, res) => {
-    Cart.findOne({ userId: req.userId })
+exports.findUserCart = (req, res) => {
+    Cart.find({ userId: req.userId })
         .then(data => {
             res.status(200).send(data)
         })
@@ -45,22 +46,46 @@ exports.findOne = (req, res) => {
         })
 }
 
-exports.getProductCart = (req, res) => {
+exports.findOneCart = (req, res) => {
+
     const id = req.params.id
 
-    Cart.findOne({products: {}})
+    Cart.findById(id)
         .then(data => {
-            console.log(data)
-            res.send(data)
+            if(!data) res.status(404).send({
+                msg: `Could not find cart with id=${id}. Maybe the cart does not exist.`
+            })
+           else res.status(200).send(data)
         })
-        .catch(err => {
-            res.status(500).send({
-                msg: err.message
+        .catch( err => res.status(500).send({ msg: err.message }))
+}   
+
+// UPDATE CART
+exports.update = (req, res) => {
+    if(!req.body.quantity){
+        res.status(404).send({
+            msg: "You can't update empty quantity field."
+        })
+        return
+    }
+
+    const id = req.params.id
+
+    Cart.findByIdAndUpdate(id, req.body.quantity, { useFindAndModify: false })
+        .then(data => {
+            if(!data) return res.status(404).send({
+                msg: `You cannot update cart with id=${id}. Maybe it was not found.`
+            }) 
+            else return res.status(202).send({
+                msg: "Your cart is updated successfully!"
             })
         })
+        .catch( err => res.status(500).send({ msg: err.message }))
 }
 
-exports.update = (req, res) => {
+
+// UPDATE PRODUCT
+exports.updateOneProduct = async (req, res) => {
     if(!req.body.quantity){
         res.status(400).send({
             msg: "You forgot to change the quantity."
@@ -69,35 +94,23 @@ exports.update = (req, res) => {
     }
 
     const id = req.params.id
-
-    let cart = Cart.findOne({userId: req.userId})
-    console.log(cart)
+    const prodId = req.params.productId
+    console.log(req.userId)
+    let cart = await Cart.findById(id)
+    // console.log(cart)
     if(cart){
-        for(let i = 0; i < cart.products.length; i++){
-            if(cart.products[i].productId === id){
-                cart.products[i].quantity = req.body.quantity
-            }
-        }
+        let v = cart.products.find(ele => prodId == ele.productId)
+        console.log(v)
+        // let qty = cart.products[v].quantity
+        
+        await cart.updateOne({ $pull: { products: v }})
+        await cart.updateOne({ $push: { products: { productsId: prodId, quantity: req.body.quantity }}})
+        res.status(200).send(cart)
     }
 
-    cart.save(cart)
-        .then(data => {
-            if(!data){
-                res.status(400).send({
-                    msg: `Could not find product with id=${id}`
-                })
-            } else {
-                
-                res.status(200).send(data)
-            }
-        })
-        .catch(err => {
-            res.status(500).send({
-                msg: err.message
-            })
-        })
 }
 
+// DELETE CART
 exports.delete = (req, res) => {
     const id = req.params.id
 
@@ -117,4 +130,18 @@ exports.delete = (req, res) => {
                 msg: `Could not delete cart with id=${id}.`
             })
         })
+}
+
+exports.deleteOneProdct = async (req, res) => {
+    const id = req.params.id
+    const prodId = req.params.productId
+    let cart = await Cart.findById(id)
+    
+    if(cart){
+        let v = cart.products.find(ele => prodId == ele.productId)
+        console.log(v)
+        // let qty = cart.products[v].quantity
+        
+        await cart.updateOne({ $pull: { products: v }})
+    }
 }
